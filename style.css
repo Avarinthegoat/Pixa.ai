@@ -1,1004 +1,652 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixAI - Free AI Image Generator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        :root {
-            --primary: #6c63ff;
-            --secondary: #4a44c9;
-            --dark: #2a2a3c;
-            --light: #f8f9fa;
-            --text: #333344;
-            --accent: #ff6b8b;
-        }
-
-        body {
-            background-color: #f5f7ff;
-            color: var(--text);
-            line-height: 1.6;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header Styles */
-        header {
-            background-color: white;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .logo i {
-            margin-right: 10px;
-            font-size: 28px;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-left: 30px;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .auth-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-            font-size: 16px;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 80px 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .hero-content {
-            flex: 1;
-            max-width: 550px;
-        }
-
-        .hero-image {
-            flex: 1;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 48px;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-
-        .hero p {
-            font-size: 18px;
-            margin-bottom: 30px;
-            color: #666;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        .hero-image img {
-            max-width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Image Generator Section */
-        .generator {
-            padding: 80px 0;
-            background: white;
-        }
-
-        .generator-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-top: 40px;
-        }
-
-        .prompt-input {
-            background: var(--light);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .prompt-input textarea {
-            width: 100%;
-            height: 150px;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            resize: vertical;
-            margin-bottom: 20px;
-            font-family: inherit;
-        }
-
-        .style-options {
-            margin-bottom: 20px;
-        }
-
-        .style-options label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .style-options select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
-        }
-
-        .result-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--light);
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            min-height: 300px;
-            padding: 20px;
-        }
-
-        .image-placeholder {
-            text-align: center;
-            color: #999;
-        }
-
-        .image-placeholder i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            color: #ccc;
-        }
-
-        .generated-image {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .image-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-
-        /* Features Section */
-        .features {
-            padding: 80px 0;
-            background-color: white;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-title h2 {
-            font-size: 36px;
-            color: var(--dark);
-            margin-bottom: 15px;
-        }
-
-        .section-title p {
-            color: #666;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .feature-card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            background: rgba(108, 99, 255, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .feature-icon i {
-            font-size: 30px;
-            color: var(--primary);
-        }
-
-        .feature-card h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
-            color: var(--dark);
-        }
-
-        /* Gallery */
-        .gallery {
-            padding: 80px 0;
-            background-color: white;
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .gallery-item {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .gallery-item:hover {
-            transform: scale(1.05);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            padding: 60px 0 30px;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-column h3 {
-            font-size: 20px;
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        .footer-column h3:after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -10px;
-            width: 40px;
-            height: 3px;
-            background: var(--primary);
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-
-        .footer-links a {
-            color: #bbb;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .social-links a {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            transition: background 0.3s;
-        }
-
-        .social-links a:hover {
-            background: var(--primary);
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #bbb;
-            font-size: 14px;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal h2 {
-            margin-bottom: 20px;
-            text-align: center;
-            color: var(--dark);
-        }
-
-        .modal input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
-        }
-
-        .modal .btn {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .form-message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            display: none;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .hero {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .hero-content {
-                margin-bottom: 50px;
-            }
-            
-            .hero-buttons {
-                justify-content: center;
-            }
-            
-            .generator-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 36px;
-            }
-            
-            .section-title h2 {
-                font-size: 30px;
-            }
-            
-            .auth-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .hero h1 {
-                font-size: 28px;
-            }
-            
-            .hero-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-        }
-
-        /* Loading spinner */
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <nav class="navbar">
-                <div class="logo">
-                    <i class="fas fa-palette"></i>
-                    <span>PixAI</span>
-                </div>
-                <ul class="nav-links">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#generator">Generate</a></li>
-                    <li><a href="#gallery">Gallery</a></li>
-                    <li><a href="#">About</a></li>
-                </ul>
-                <div class="auth-buttons">
-                    <button class="btn btn-outline" onclick="openModal('loginModal')">Log In</button>
-                    <button class="btn btn-primary" onclick="openModal('signupModal')">Sign Up Free</button>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Create Stunning AI Art in Seconds</h1>
-                <p>Transform your ideas into beautiful images with our powerful AI image generator. No design skills required - just describe what you want to see!</p>
-                <div class="hero-buttons">
-                    <button class="btn btn-primary" onclick="scrollToGenerator()">Start Creating</button>
-                    <button class="btn btn-outline" onclick="scrollToGallery()">View Gallery</button>
-                </div>
-            </div>
-            <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="AI Generated Art">
-            </div>
-        </div>
-    </section>
-
-    <!-- Image Generator Section -->
-    <section class="generator" id="generator">
-        <div class="container">
-            <div class="section-title">
-                <h2>Create Your AI Art</h2>
-                <p>Describe what you want to see and let our AI work its magic</p>
-            </div>
-            <div class="generator-container">
-                <div class="prompt-input">
-                    <textarea id="promptText" placeholder="Describe your image in detail... e.g., 'A majestic dragon flying over a medieval castle at sunset, digital art'"></textarea>
-                    <div class="style-options">
-                        <label for="artStyle">Art Style:</label>
-                        <select id="artStyle">
-                            <option>Realistic</option>
-                            <option>Anime</option>
-                            <option>Oil Painting</option>
-                            <option>Digital Art</option>
-                            <option>Watercolor</option>
-                            <option>Fantasy</option>
-                            <option>Cyberpunk</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary generate-btn" onclick="generateImage()" id="generateBtn">
-                        <i class="fas fa-magic"></i> Generate Image
-                    </button>
-                </div>
-                <div class="result-container">
-                    <div class="image-placeholder" id="imageResult">
-                        <i class="fas fa-image"></i>
-                        <p>Your generated image will appear here</p>
-                    </div>
-                </div>
-            </div>
-            <div class="image-actions" id="imageActions" style="display: none;">
-                <button class="btn btn-outline" onclick="downloadImage()">
-                    <i class="fas fa-download"></i> Download
-                </button>
-                <button class="btn btn-outline" onclick="saveImage()">
-                    <i class="fas fa-heart"></i> Save
-                </button>
-                <button class="btn btn-outline" onclick="shareImage()">
-                    <i class="fas fa-share"></i> Share
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <div class="section-title">
-                <h2>How It Works</h2>
-                <p>Creating AI art has never been easier</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-edit"></i>
-                    </div>
-                    <h3>Describe Your Vision</h3>
-                    <p>Write a detailed description of what you want to create. The more specific, the better the results!</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-palette"></i>
-                    </div>
-                    <h3>Choose Your Style</h3>
-                    <p>Select from various art styles including realistic, anime, oil painting, digital art, and more.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-image"></i>
-                    </div>
-                    <h3>Get Your Artwork</h3>
-                    <p>Download your creation in high resolution suitable for printing, social media, and professional use.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Gallery -->
-    <section class="gallery" id="gallery">
-        <div class="container">
-            <div class="section-title">
-                <h2>Sample Creations</h2>
-                <p>See what you can create with our AI image generator</p>
-            </div>
-            <div class="gallery-grid">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1682687221363-72518513620e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80" alt="AI Art 1">
-                </div>
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1682687221038-404670f1d13a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80" alt="AI Art 2">
-                </div>
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1682695797221-8164ff1fafc9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="AI Art 3">
-                </div>
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1682687220509-61b8a906ca19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="AI Art 4">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>PixAI</h3>
-                    <p>Create stunning AI art with our free image generator.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-discord"></i></a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Product</h3>
-                    <ul class="footer-links">
-                        <li><a href="#generator">Generate Images</a></li>
-                        <li><a href="#gallery">Gallery</a></li>
-                        <li><a href="#">API Access</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Support</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>&copy; 2023 PixAI. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <h2>Log In</h2>
-            <form id="loginForm">
-                <input type="email" placeholder="Email" required id="loginEmail">
-                <input type="password" placeholder="Password" required id="loginPassword">
-                <button type="submit" class="btn btn-primary">Log In</button>
-            </form>
-            <div class="form-message" id="loginMessage"></div>
-            <button class="btn btn-outline" onclick="closeModal('loginModal')" style="margin-top: 10px;">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Signup Modal -->
-    <div class="modal" id="signupModal">
-        <div class="modal-content">
-            <h2>Sign Up</h2>
-            <form id="signupForm">
-                <input type="text" placeholder="Full Name" required id="signupName">
-                <input type="email" placeholder="Email" required id="signupEmail">
-                <input type="password" placeholder="Password" required id="signupPassword">
-                <button type="submit" class="btn btn-primary">Create Account</button>
-            </form>
-            <div class="form-message" id="signupMessage"></div>
-            <button class="btn btn-outline" onclick="closeModal('signupModal')" style="margin-top: 10px;">Cancel</button>
-        </div>
-    </div>
-
-    <script>
-        // Store users in localStorage
-        if (!localStorage.getItem('users')) {
-            localStorage.setItem('users', JSON.stringify([]));
-        }
-
-        // Modal Functions
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-            // Clear messages when opening modal
-            document.getElementById('loginMessage').style.display = 'none';
-            document.getElementById('signupMessage').style.display = 'none';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-
-        // Scroll Functions
-        function scrollToGenerator() {
-            document.getElementById('generator').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function scrollToGallery() {
-            document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Working Signup Form
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('signupName').value;
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const messageEl = document.getElementById('signupMessage');
-            
-            // Basic validation
-            if (password.length < 6) {
-                showMessage(messageEl, 'Password must be at least 6 characters', 'error');
-                return;
-            }
-            
-            const users = JSON.parse(localStorage.getItem('users'));
-            
-            // Check if user already exists
-            if (users.find(user => user.email === email)) {
-                showMessage(messageEl, 'User already exists with this email', 'error');
-                return;
-            }
-            
-            // Add new user
-            users.push({ name, email, password });
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            showMessage(messageEl, 'Account created successfully! You can now log in.', 'success');
-            
-            // Clear form
-            document.getElementById('signupForm').reset();
-            
-            // Auto close after success
-            setTimeout(() => {
-                closeModal('signupModal');
-                openModal('loginModal');
-            }, 2000);
-        });
-
-        // Working Login Form
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const messageEl = document.getElementById('loginMessage');
-            
-            const users = JSON.parse(localStorage.getItem('users'));
-            const user = users.find(user => user.email === email && user.password === password);
-            
-            if (user) {
-                // Store current user session
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                showMessage(messageEl, `Welcome back, ${user.name}!`, 'success');
-                
-                // Update UI for logged in user
-                updateAuthUI(user);
-                
-                setTimeout(() => {
-                    closeModal('loginModal');
-                }, 1500);
-            } else {
-                showMessage(messageEl, 'Invalid email or password', 'error');
-            }
-        });
-
-        function showMessage(element, message, type) {
-            element.textContent = message;
-            element.className = `form-message ${type}`;
-            element.style.display = 'block';
-        }
-
-        function updateAuthUI(user) {
-            document.querySelector('.auth-buttons').innerHTML = `
-                <span style="margin-right: 15px;">Welcome, ${user.name}</span>
-                <button class="btn btn-outline" onclick="logout()">Log Out</button>
-            `;
-        }
-
-        function logout() {
-            localStorage.removeItem('currentUser');
-            location.reload();
-        }
-
-        // Check if user is already logged in
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (currentUser) {
-            updateAuthUI(currentUser);
-        }
-
-        // Working Image Generation
-        function generateImage() {
-            const prompt = document.getElementById('promptText').value;
-            const style = document.getElementById('artStyle').value;
-            const generateBtn = document.getElementById('generateBtn');
-            
-            if (!prompt.trim()) {
-                alert('Please enter a description for your image!');
-                return;
-            }
-
-            // Show loading state
-            generateBtn.disabled = true;
-            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-            
-            const imageResult = document.getElementById('imageResult');
-            imageResult.innerHTML = `
-                <div class="spinner"></div>
-                <p>Creating your "${prompt}" in ${style} style...</p>
-                <p><small>This may take 10-30 seconds</small></p>
-            `;
-            
-            // Simulate AI generation with better images
-            setTimeout(() => {
-                // Use Unsplash source for demo images based on prompt
-                const searchTerm = encodeURIComponent(prompt.split(' ').slice(0, 2).join(' '));
-                const imageUrl = `https://source.unsplash.com/600x400/?${searchTerm},${style}`;
-                
-                imageResult.innerHTML = `
-                    <img src="${imageUrl}" alt="Generated: ${prompt}" class="generated-image">
-                    <p><strong>Prompt:</strong> ${prompt}<br><strong>Style:</strong> ${style}</p>
-                `;
-                
-                // Store image data for download
-                imageResult.dataset.imageUrl = imageUrl;
-                imageResult.dataset.prompt = prompt;
-                
-                // Show download buttons
-                document.getElementById('imageActions').style.display = 'flex';
-                
-                // Reset button
-                generateBtn.disabled = false;
-                generateBtn.innerHTML = '<i class="fas fa-magic"></i> Generate Image';
-            }, 3000); // 3 second delay for realism
-        }
-
-        function downloadImage() {
-            const imageUrl = document.getElementById('imageResult').dataset.imageUrl;
-            const prompt = document.getElementById('imageResult').dataset.prompt;
-            
-            if (!imageUrl) {
-                alert('No image to download! Generate an image first.');
-                return;
-            }
-            
-            // Create temporary link for download
-            const link = document.createElement('a');
-            link.href = imageUrl;
-            link.download = `ai-art-${prompt.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.jpg`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            alert('Image download started!');
-        }
-
-        function saveImage() {
-            alert('Image saved to your gallery! (In a real app, this would save to your account)');
-        }
-
-        function shareImage() {
-            const prompt = document.getElementById('imageResult').dataset.prompt;
-            if (navigator.share) {
-                navigator.share({
-                    title: 'My AI Art Creation',
-                    text: `Check out this AI art I created: ${prompt}`,
-                    url: window.location.href
-                });
-            } else {
-                alert('Share feature available on mobile devices or copy the URL to share.');
-            }
-        }
-
-        // Add ripple effect to buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            const buttons = document.querySelectorAll('.btn');
-            
-            buttons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    if (this.disabled) return;
-                    
-                    const ripple = document.createElement('span');
-                    const rect = this.getBoundingClientRect();
-                    const size = Math.max(rect.width, rect.height);
-                    const x = e.clientX - rect.left - size/2;
-                    const y = e.clientY - rect.top - size/2;
-                    
-                    ripple.style.width = ripple.style.height = size + 'px';
-                    ripple.style.left = x + 'px';
-                    ripple.style.top = y + 'px';
-                    ripple.classList.add('ripple');
-                    
-                    this.appendChild(ripple);
-                    
-                    setTimeout(() => {
-                        ripple.remove();
-                    }, 600);
-                });
-            });
-        });
-    </script>
-</body>
-</html>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:root {
+    --primary: #8b5cf6;
+    --secondary: #7c3aed;
+    --dark: #0f0f23;
+    --darker: #090917;
+    --light: #1a1a2e;
+    --text: #e2e8f0;
+    --accent: #f472b6;
+}
+
+body {
+    background: linear-gradient(135deg, var(--darker), var(--dark));
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header Styles */
+header {
+    background: rgba(15, 15, 35, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(139, 92, 246, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.logo i {
+    margin-right: 10px;
+    font-size: 28px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li {
+    margin-left: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 500;
+    transition: all 0.3s;
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.nav-links a:hover {
+    color: var(--primary);
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    font-size: 16px;
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    box-shadow: none;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Hero Section */
+.hero {
+    padding: 100px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.1), transparent 50%);
+}
+
+.hero-content {
+    flex: 1;
+    max-width: 550px;
+}
+
+.hero-image {
+    flex: 1;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: white;
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+}
+
+.hero p {
+    font-size: 1.25rem;
+    margin-bottom: 32px;
+    color: #cbd5e1;
+    line-height: 1.8;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.hero-image img {
+    max-width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+/* Image Generator Section */
+.generator {
+    padding: 100px 0;
+    background: rgba(15, 15, 35, 0.5);
+}
+
+.generator-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.prompt-input {
+    background: rgba(26, 26, 46, 0.8);
+    padding: 32px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.prompt-input textarea {
+    width: 100%;
+    height: 150px;
+    padding: 16px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    font-size: 16px;
+    resize: vertical;
+    margin-bottom: 24px;
+    font-family: inherit;
+    background: rgba(15, 15, 35, 0.8);
+    color: var(--text);
+    transition: all 0.3s;
+}
+
+.prompt-input textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.style-options {
+    margin-bottom: 24px;
+}
+
+.style-options label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.style-options select {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    background: rgba(15, 15, 35, 0.8);
+    color: var(--text);
+    transition: all 0.3s;
+}
+
+.style-options select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.result-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(26, 26, 46, 0.8);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    backdrop-filter: blur(10px);
+    min-height: 400px;
+    padding: 32px;
+}
+
+.image-placeholder {
+    text-align: center;
+    color: #94a3b8;
+}
+
+.image-placeholder i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: rgba(139, 92, 246, 0.5);
+}
+
+.generated-image {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.image-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    justify-content: center;
+}
+
+/* Features Section */
+.features {
+    padding: 100px 0;
+    background: rgba(15, 15, 35, 0.3);
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.section-title h2 {
+    font-size: 3rem;
+    color: white;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.section-title p {
+    color: #94a3b8;
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 1.25rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+}
+
+.feature-card {
+    background: rgba(26, 26, 46, 0.8);
+    border-radius: 20px;
+    padding: 40px 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.feature-icon i {
+    font-size: 36px;
+    color: var(--primary);
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    color: white;
+}
+
+.feature-card p {
+    color: #94a3b8;
+    line-height: 1.7;
+}
+
+/* Gallery */
+.gallery {
+    padding: 100px 0;
+    background: rgba(15, 15, 35, 0.5);
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.gallery-item {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.3);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Footer */
+footer {
+    background: var(--darker);
+    color: white;
+    padding: 80px 0 40px;
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 48px;
+    margin-bottom: 48px;
+}
+
+.footer-column h3 {
+    font-size: 1.25rem;
+    margin-bottom: 24px;
+    position: relative;
+    color: white;
+}
+
+.footer-column h3:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 32px;
+    height: 3px;
+    background: var(--primary);
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--primary);
+}
+
+.social-links {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.social-links a {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(139, 92, 246, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    transition: all 0.3s;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.social-links a:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(9, 9, 23, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: rgba(26, 26, 46, 0.95);
+    padding: 48px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 440px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    backdrop-filter: blur(20px);
+}
+
+.modal h2 {
+    margin-bottom: 32px;
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+}
+
+.modal input {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    background: rgba(15, 15, 35, 0.8);
+    color: var(--text);
+    transition: all 0.3s;
+}
+
+.modal input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.modal .btn {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.form-message {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    display: none;
+    font-weight: 500;
+}
+
+.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .hero-content {
+        margin-bottom: 60px;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+    
+    .generator-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+    
+    .section-title h2 {
+        font-size: 2rem;
+    }
+    
+    .auth-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .hero p {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    .image-actions {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        padding: 32px 24px;
+        margin: 20px;
+    }
+}
+
+/* Loading spinner */
+.spinner {
+    border: 4px solid rgba(139, 92, 246, 0.2);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Ripple effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
